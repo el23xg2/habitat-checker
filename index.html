@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Habitat Engine | Reptile Care Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #111827; }
+        .hidden { display: none !important; }
+        .glass-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-shadow:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08); }
+        .gradient-text { background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4 flex justify-center items-start">
+
+    <div class="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
+        
+        <div class="glass-header px-8 py-12 text-center relative">
+            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine</h1>
+            <p class="text-slate-400 text-sm max-w-lg mx-auto font-medium leading-relaxed">
+                Precision heating calculations based on thermodynamic physics. Stop guessing wattages and keep your pets safe.
+            </p>
+        </div>
+
+        <div class="p-6 sm:p-12 space-y-12">
+            
+            <section>
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-bold text-sm">1</span>
+                    <h2 class="text-xl font-bold text-gray-800">What kind of pet are you housing?</h2>
+                </div>
+                <div class="bg-gray-50 p-2 rounded-2xl border border-gray-200">
+                    <select id="speciesType" onchange="updateUI()" class="w-full px-4 py-3 bg-transparent outline-none font-semibold text-gray-700 cursor-pointer">
+                        <option value="leopard">🐆 Terrestrial (Leopard Gecko, Hognose, etc.)</option>
+                        <option value="crested">🦎 Arboreal (Crested Gecko, Chameleon, etc.)</option>
+                        <option value="bearded" selected>🦖 Arid/Basking (Bearded Dragon, Uromastyx, etc.)</option>
+                    </select>
+                </div>
+            </section>
+            
+            <section>
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-bold text-sm">2</span>
+                    <h2 class="text-xl font-bold text-gray-800">Environmental Parameters</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow">
+                        <label id="targetLabel" class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Target Temp (°C)</label>
+                        <input type="number" id="targetTemp" value="40" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
+                    </div>
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow">
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Ambient Room Temp (°C)</label>
+                        <input type="number" id="roomTemp" value="25" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">🏠 Enclosure Type (Heat Retention)</label>
+                    <select id="enclosureType" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-400 text-sm font-semibold text-gray-700 cursor-pointer">
+                        <option value="0.45" selected>Screen Top Glass (High heat loss)</option>
+                        <option value="0.65">Acrylic / Semi-Closed (Moderate loss)</option>
+                        <option value="0.85">PVC / Wooden Enclosure (Excellent insulation)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow">
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Substrate Material</label>
+                        <select id="substrateType" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition cursor-pointer text-sm font-bold">
+                            <option value="paper">🧻 Paper Towel</option>
+                            <option value="bark">🪵 Orchid Bark / Mulch</option>
+                            <option value="coco">🥥 Coco Fiber / Soil</option>
+                            <option value="sand" selected>🏜️ Reptile Sand (High absorption)</option>
+                            <option value="rock">🪨 Slate / Rock Basking Site</option>
+                        </select>
+                    </div>
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow">
+                        <label id="depthLabel" class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Substrate Depth (cm)</label>
+                        <input type="number" id="depth" value="2.0" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
+                    </div>
+                </div>
+
+                <div class="bg-sky-50 p-6 rounded-3xl border border-sky-100 mb-6">
+                    <label class="block text-sm font-bold text-sky-900 mb-3">💧 Misting Habits (Evaporative Cooling)</label>
+                    <select id="climateType" class="w-full px-4 py-3 bg-white border border-sky-200 rounded-2xl outline-none focus:ring-2 focus:ring-sky-400 text-sm font-semibold text-gray-700 cursor-pointer">
+                        <option value="desert" selected>🌵 Arid (No misting, low humidity)</option>
+                        <option value="moderate">🌳 Temperate (Occasional misting)</option>
+                        <option value="rainforest">🌧️ Tropical (Frequent misting/High humidity)</option>
+                    </select>
+                </div>
+                
+                <div id="zAxisSettings" class="mt-4 p-6 bg-amber-50 border border-amber-200 rounded-3xl transition-all hidden">
+                    <label class="block text-sm font-bold text-amber-900 mb-2">🌲 Pet Resting Height (cm from bottom)</label>
+                    <p class="text-xs text-amber-700 mb-4 font-medium italic">We need this to calculate vertical heat loss through convection.</p>
+                    <input type="number" id="petHeight" value="30" class="w-full md:w-1/2 px-4 py-2.5 bg-white border border-amber-300 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 font-mono text-lg">
+                </div>
+            </section>
+
+            <hr class="border-gray-100">
+
+            <section>
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-bold text-sm">3</span>
+                    <h2 class="text-xl font-bold text-gray-800">Heating Hardware</h2>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <div class="flex-1 p-6 border-2 border-gray-100 rounded-[2rem] bg-white card-shadow hover:border-indigo-200">
+                        <label class="flex items-center cursor-pointer mb-6">
+                            <input type="checkbox" id="hasLamp" onchange="updateUI()" checked class="w-6 h-6 text-indigo-600 rounded-lg border-gray-300 focus:ring-indigo-500">
+                            <span class="ml-3 font-black text-gray-800">Overhead Heat Lamp</span>
+                        </label>
+                        <div id="lampSettings" class="space-y-5 transition-opacity">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Wattage Selection</label>
+                                <select id="lampWattage" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 cursor-pointer outline-none">
+                                    <option value="auto">Recommend Best Fit</option>
+                                    <option value="25">I already have 25W</option>
+                                    <option value="50">I already have 50W</option>
+                                    <option value="75">I already have 75W</option>
+                                    <option value="100">I already have 100W</option>
+                                    <option value="150">I already have 150W</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label id="lampDistLabel" class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Distance to target (cm)</label>
+                                <input type="number" id="lampDist" value="30" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono font-bold outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 p-6 border-2 border-gray-100 rounded-[2rem] bg-white card-shadow hover:border-indigo-200">
+                        <label class="flex items-center cursor-pointer mb-4">
+                            <input type="checkbox" id="hasUth" onchange="updateUI()" class="w-6 h-6 text-indigo-600 rounded-lg border-gray-300 focus:ring-indigo-500">
+                            <span class="ml-3 font-black text-gray-800">Heat Mat (UTH)</span>
+                        </label>
+                        <p class="text-xs text-gray-400 font-medium leading-relaxed">
+                            System will calculate the necessary thermostat offset if your overhead lamp leaves a heat gap.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <button onclick="calculate()" class="w-full bg-gray-900 text-white font-black text-lg py-5 rounded-2xl shadow-xl hover:bg-indigo-600 hover:shadow-indigo-200 transition-all duration-500 transform hover:-translate-y-1">
+                GENERATE HABITAT REPORT
+            </button>
+
+            <div id="resultPanel" class="hidden mt-12 pt-12 border-t-2 border-dashed border-gray-100">
+                <h3 class="text-2xl font-black text-center text-gray-800 mb-10 gradient-text">Recommended Configuration</h3>
+                
+                <div id="criticalError" class="hidden p-6 bg-red-50 text-red-900 rounded-[2rem] border border-red-100 shadow-sm mb-8 font-bold"></div>
+                
+                <div id="successResults" class="grid grid-cols-1 gap-6">
+                    <div id="lampResultBox" class="hidden bg-white p-8 rounded-[2rem] border border-blue-50 flex justify-between items-center shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                        <div>
+                            <span class="block text-xs font-black text-blue-400 uppercase tracking-widest">Recommended Lamp</span>
+                            <span class="block text-sm text-gray-400 mt-1 font-medium" id="exactWattage">Theoretical Demand: --W</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-5xl font-black text-blue-600" id="lampRes">-- W</span>
+                        </div>
+                    </div>
+                    
+                    <div id="uthResultBox" class="hidden bg-white p-8 rounded-[2rem] border border-orange-50 flex justify-between items-center shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-orange-400"></div>
+                        <div>
+                            <span class="block text-xs font-black text-orange-400 uppercase tracking-widest">Thermostat Setting</span>
+                            <span class="block text-sm text-gray-400 mt-1 font-medium" id="uthStatus">Compensation for heat loss</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-5xl font-black text-orange-500" id="uthRes">-- °C</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="warnings" class="space-y-4 mt-10"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SPECIES = {
+            leopard: { label: "Target Surface Temp (°C)", distLabel: "Distance: Lamp to floor (cm)", isAir: false, isDesert: false },
+            crested: { label: "Target Ambient Air Temp (°C)", distLabel: "Distance: Lamp to perch (cm)", isAir: true, isDesert: false },
+            bearded: { label: "Target Basking Temp (°C)", distLabel: "Distance: Lamp to rock (cm)", isAir: false, isDesert: true }
+        };
+
+        const SUB_PROPS = {
+            paper: { lambda: 0.05, topAbs: 0.8 }, bark: { lambda: 0.11, topAbs: 1.0 },
+            coco: { lambda: 0.06, topAbs: 1.05 }, sand: { lambda: 0.25, topAbs: 1.35 },
+            rock: { lambda: 2.0, topAbs: 1.5 }
+        };
+
+        function updateUI() {
+            const sp = SPECIES[document.getElementById('speciesType').value];
+            const hasLamp = document.getElementById('hasLamp').checked;
+            document.getElementById('targetLabel').innerText = sp.label;
+            document.getElementById('lampDistLabel').innerText = sp.distLabel;
+            
+            const lampSet = document.getElementById('lampSettings');
+            lampSet.style.opacity = hasLamp ? '1' : '0.4';
+            lampSet.style.pointerEvents = hasLamp ? 'auto' : 'none';
+
+            const zAxisSet = document.getElementById('zAxisSettings');
+            if (sp.isAir) zAxisSet.classList.remove('hidden');
+            else zAxisSet.classList.add('hidden');
+        }
+
+        function calculate() {
+            const spKey = document.getElementById('speciesType').value;
+            const sp = SPECIES[spKey];
+            const hasLamp = document.getElementById('hasLamp').checked;
+            const hasUth = document.getElementById('hasUth').checked;
+            
+            const T_targ = parseFloat(document.getElementById('targetTemp').value);
+            const T_room = parseFloat(document.getElementById('roomTemp').value);
+            const depthM = parseFloat(document.getElementById('depth').value) / 100;
+            const sub = SUB_PROPS[document.getElementById('substrateType').value];
+            const climate = document.getElementById('climateType').value;
+            const enclosureRetention = parseFloat(document.getElementById('enclosureType').value);
+            const lampDistM = parseFloat(document.getElementById('lampDist').value) / 100;
+            const lampSel = document.getElementById('lampWattage').value;
+            const petH = parseFloat(document.getElementById('petHeight').value);
+
+            const pnl = document.getElementById('resultPanel');
+            const err = document.getElementById('criticalError');
+            const succ = document.getElementById('successResults');
+            const warn = document.getElementById('warnings');
+            
+            pnl.classList.remove('hidden'); succ.classList.remove('hidden'); err.classList.add('hidden'); warn.innerHTML = '';
+            document.getElementById('lampResultBox').classList.add('hidden'); document.getElementById('uthResultBox').classList.add('hidden');
+
+            if (!hasLamp && !hasUth) {
+                err.innerHTML = "Error: Please select at least one heating source.";
+                err.classList.remove('hidden'); succ.classList.add('hidden'); return;
+            }
+
+            // Night Drop Warning
+            if (sp.isDesert && hasLamp && !hasUth && T_room < 18) {
+                warn.innerHTML += `<div class="p-6 bg-indigo-50 border border-indigo-100 rounded-3xl"><p class="font-black text-indigo-900 mb-2 tracking-tight">🌙 Night-Time Temperature Alert</p><p class="text-sm text-indigo-700 leading-relaxed">Your room is cold (${T_room}°C). When the light goes off, the temperature will plummet. We strongly suggest a secondary non-light heat source (Ceramic Heat Emitter) for night-time.</p></div>`;
+            }
+
+            let q_sensible = 8.5 * (T_targ - T_room);
+            let q_latent = 0;
+            if (climate === 'moderate' && sp.isAir) q_sensible *= 1.1;
+            if (climate === 'rainforest') {
+                if (sp.isAir) q_sensible *= 1.25;
+                q_latent = 20 * (T_targ / 20);
+            }
+
+            let q_req_total = (q_sensible + q_latent) / enclosureRetention;
+            let p_lamp = 0; let q_def = q_req_total; let forceUthOnly = false;
+
+            if (hasLamp) {
+                let abs = sp.isAir ? 1.0 : sub.topAbs;
+                let p_ideal = (q_req_total * Math.pow(lampDistM, 2)) / (0.15 * abs);
+                const LAMPS = [25, 50, 75, 100, 150];
+
+                if (lampSel === 'auto') {
+                    if (hasUth && p_ideal < 10 && !sp.isAir) {
+                        forceUthOnly = true; p_lamp = 0;
+                        warn.innerHTML += `<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl"><p class="text-xs font-bold text-slate-500 italic">Eco-Mode: Heat mat is sufficient; light remains off to prevent overheating.</p></div>`;
+                    } else if (hasUth) {
+                        p_lamp = LAMPS.find(l => l * 1.3 >= p_ideal) || 150;
+                    } else {
+                        p_lamp = LAMPS.slice().reverse().find(l => l <= p_ideal * 1.2) || 25;
+                        if (p_ideal > 150) p_lamp = 150;
+                    }
+                } else p_lamp = parseInt(lampSel);
+
+                if (!forceUthOnly) {
+                    let actual_q = (0.15 * p_lamp * abs) / Math.pow(lampDistM, 2);
+                    if (hasUth && actual_q < (q_req_total * 0.1)) {
+                        forceUthOnly = true; p_lamp = 0;
+                        warn.innerHTML += `<div class="p-5 bg-amber-50 border border-amber-200 rounded-3xl"><p class="font-bold text-amber-900 mb-1">🔭 Beam Distance Warning</p><p class="text-xs text-amber-700">Lamp is too far to contribute effectively (<10% heat reached). Switched to 100% Heat Mat mode.</p></div>`;
+                    } else {
+                        q_def = q_req_total - actual_q;
+                        document.getElementById('lampResultBox').classList.remove('hidden');
+                        document.getElementById('lampRes').innerHTML = `${p_lamp}<span class="text-2xl ml-1">W</span>`;
+                        document.getElementById('exactWattage').innerText = `Physics Engine Requirement: ${p_ideal.toFixed(1)}W`;
+
+                        if (p_ideal > 150) warn.innerHTML += `<div class="p-5 bg-red-100 border border-red-200 rounded-3xl"><p class="font-black text-red-900 mb-1">🚨 Power Limit Exceeded</p><p class="text-xs text-red-800 leading-relaxed">Single 150W bulb is insufficient for this enclosure's heat loss. Upgrade to a PVC cage or use dual fixtures.</p></div>`;
+                        else if (q_def < -15) {
+                            if (!hasUth) warn.innerHTML += `<div class="p-5 bg-orange-100 border border-orange-200 rounded-3xl"><p class="font-black text-orange-900 mb-1">🔥 Overheat Risk</p><p class="text-xs text-orange-800 leading-relaxed">Current setup provides too much heat. You MUST use a Dimming Thermostat to avoid burning your pet.</p></div>`;
+                            else {
+                                const safeCm = Math.ceil(Math.sqrt((0.15 * p_lamp * abs) / q_req_total) * 100);
+                                warn.innerHTML += `<div class="p-5 bg-orange-100 border border-orange-200 rounded-3xl"><p class="font-black text-orange-900 mb-1">🔥 Raise Your Lamp</p><p class="text-xs text-orange-800 leading-relaxed">To prevent hotspots, raise your lamp fixture to at least ${safeCm} cm from the target.</p></div>`;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (hasUth || forceUthOnly) {
+                document.getElementById('uthResultBox').classList.remove('hidden');
+                if (forceUthOnly) q_def = q_req_total;
+                if (q_def <= 0 && !forceUthOnly) {
+                    document.getElementById('uthRes').innerText = T_targ;
+                    document.getElementById('uthStatus').innerText = "Safe baseline temp (Lamp covers the load)";
+                } else {
+                    document.getElementById('uthStatus').innerText = forceUthOnly ? "Handling 100% of heat load" : "Handling residue gap from lamp";
+                    let surf_n = T_targ;
+                    if (hasLamp && !forceUthOnly) surf_n = T_targ + (q_def / 8.5);
+                    if (sp.isAir) surf_n += (forceUthOnly ? (T_targ - T_room) : (q_def / 8.5)) * (petH / 10);
+                    let t_set = surf_n + (q_def * depthM) / sub.lambda;
+                    document.getElementById('uthRes').innerText = t_set.toFixed(1);
+
+                    if (t_set > 40) {
+                        document.getElementById('uthResultBox').classList.add('hidden');
+                        warn.innerHTML += `<div class="p-6 bg-red-50 border border-red-200 rounded-[2rem]"><p class="font-black text-lg text-red-900 mb-3 leading-tight">🛑 Hardware Limit Reached</p><p class="text-sm text-red-800 leading-relaxed italic">The mat would need to hit <strong>${t_set.toFixed(1)}°C</strong> to compensate for air loss. Consumer mats cap at 40°C. <br><br><strong>Solution:</strong> Increase lamp wattage or move to an insulated PVC enclosure.</p></div>`;
+                    }
+                }
+            }
+
+            // Probe Guide
+            let guide = `<div class="p-8 bg-slate-50 border border-slate-200 rounded-[2.5rem] mt-10 shadow-inner"><h4 class="font-black text-gray-800 mb-6 flex items-center text-lg uppercase tracking-tight">📍 Thermostat Probe Placement</h4><ul class="space-y-4 text-sm text-gray-600 font-semibold italic">`;
+            if (hasLamp && !forceUthOnly) guide += `<li class="flex items-start"><span class="text-blue-500 mr-3">●</span><span><strong>Lamp Probe:</strong> Hang in the air near the pet's favorite spot. DO NOT let it touch the rock or substrate directly.</span></li>`;
+            if (hasUth || forceUthOnly) guide += `<li class="flex items-start"><span class="text-orange-500 mr-3">●</span><span><strong>Mat Probe:</strong> Place directly on the glass bottom under the substrate for safe cut-off.</span></li>`;
+            guide += `</ul></div>`;
+            warn.innerHTML += guide;
+        }
+        window.onload = updateUI;
+    </script>
+</body>
+</html>

@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EVE7L307BR"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EVE7L307BR"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -295,20 +294,18 @@
                         document.getElementById('lampRes').innerHTML = `${p_lamp}<span class="text-2xl ml-1">W</span>`;
                         document.getElementById('exactWattage').innerText = `Physics Engine Requirement: ${p_ideal.toFixed(1)}W`;
 
-                        if (p_ideal > 150) warn.innerHTML += `<div class="p-5 bg-red-100 border border-red-200 rounded-3xl"><p class="font-black text-red-900 mb-1">🚨 Power Limit Exceeded</p><p class="text-xs text-red-800 leading-relaxed">Single 150W bulb is insufficient for this enclosure's heat loss. Upgrade to a PVC cage or use dual fixtures.</p></div>`;
-        } else if (p_lamp > p_ideal) {
-    let extraWattage = p_lamp - p_ideal;
-
-    // 如果溢出超过 15W，强制要求温控器
-    if (extraWattage > 15) {
-        warn.innerHTML += `<div class="p-4 bg-orange-100 border border-orange-200 rounded-xl"><p class="font-bold text-orange-700 mb-1">🔥 Overheat Risk (High)</p><p class="text-sm text-orange-600 leading-relaxed">Your ${p_lamp}W bulb is <b>${extraWattage.toFixed(1)}W</b> stronger than needed. You MUST use a Dimming Thermostat to avoid burning your pet.</p></div>`;
-    } 
-    // 如果溢出在 15W 以内，建议物理抬高灯具
-    else {
-        let safeDist = Math.ceil(Math.sqrt((0.15 * p_lamp * d2r) / q_req_total) * 100);
-        warn.innerHTML += `<div class="p-4 bg-blue-50 border border-blue-200 rounded-xl"><p class="font-bold text-blue-700 mb-1">💡 Pro Tip: Height Adjustment</p><p class="text-sm text-blue-600 leading-relaxed">Your ${p_lamp}W bulb is slightly stronger than the exact requirement (${p_ideal.toFixed(1)}W). To dissipate the extra heat, simply raise your lamp fixture to about <b>${safeDist} cm</b> from the target. No thermostat needed for this slight overage.</p></div>`;
-    }
-}
+                        if (p_ideal > 150) {
+                            warn.innerHTML += `<div class="p-5 bg-red-100 border border-red-200 rounded-3xl"><p class="font-black text-red-900 mb-1">🚨 Power Limit Exceeded</p><p class="text-xs text-red-800 leading-relaxed">Single 150W bulb is insufficient for this enclosure's heat loss. Upgrade to a PVC cage or use dual fixtures.</p></div>`;
+                        } else if (p_lamp > p_ideal) {
+                            let extraWattage = p_lamp - p_ideal;
+                            
+                            if (extraWattage > 15) {
+                                warn.innerHTML += `<div class="p-4 bg-orange-100 border border-orange-200 rounded-xl"><p class="font-bold text-orange-700 mb-1">🔥 Overheat Risk (High)</p><p class="text-sm text-orange-600 leading-relaxed">Your ${p_lamp}W bulb is <b>${extraWattage.toFixed(1)}W</b> stronger than needed. You MUST use a Dimming Thermostat to avoid burning your pet.</p></div>`;
+                            } else {
+                                let safeDist = Math.ceil(Math.sqrt((0.15 * p_lamp * abs) / q_req_total) * 100);
+                                warn.innerHTML += `<div class="p-4 bg-blue-50 border border-blue-200 rounded-xl"><p class="font-bold text-blue-700 mb-1">💡 Pro Tip: Height Adjustment</p><p class="text-sm text-blue-600 leading-relaxed">Your ${p_lamp}W bulb is slightly stronger than the exact requirement (${p_ideal.toFixed(1)}W). To dissipate the extra heat, simply raise your lamp fixture to about <b>${safeDist} cm</b> from the target. No thermostat needed for this slight overage.</p></div>`;
+                            }
+                        }
                     }
                 }
             }

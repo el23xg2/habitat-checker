@@ -294,7 +294,7 @@
                         document.getElementById('lampRes').innerHTML = `${p_lamp}<span class="text-2xl ml-1">W</span>`;
                         document.getElementById('exactWattage').innerText = `Physics Engine Requirement: ${p_ideal.toFixed(1)}W`;
 
-                        if (p_ideal > 150) {
+                        if (p_ideal > 160) {
                             warn.innerHTML += `<div class="p-5 bg-red-100 border border-red-200 rounded-3xl"><p class="font-black text-red-900 mb-1">🚨 Power Limit Exceeded</p><p class="text-xs text-red-800 leading-relaxed">Single 150W bulb is insufficient for this enclosure's heat loss. Upgrade to a PVC cage or use dual fixtures.</p></div>`;
                         } else if (p_lamp > p_ideal) {
                             let extraWattage = p_lamp - p_ideal;

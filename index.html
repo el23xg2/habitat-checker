@@ -29,7 +29,7 @@
     <div class="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
         
         <div class="glass-header px-8 py-12 text-center relative">
-            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine</h1>
+            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine <span class="text-xs bg-indigo-500 text-white px-2 py-1 rounded-full align-middle ml-2">v1.1</span></h1>
             <p class="text-slate-400 text-sm max-w-lg mx-auto font-medium leading-relaxed">
                 Precision heating calculations based on thermodynamic physics. Stop guessing wattages and keep your pets safe.
             </p>
@@ -125,6 +125,14 @@
                             <span class="ml-3 font-black text-gray-800">Overhead Heat Lamp</span>
                         </label>
                         <div id="lampSettings" class="space-y-5 transition-opacity">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Bulb Type (Efficiency)</label>
+                                <select id="bulbType" class="w-full px-3 py-2.5 bg-indigo-50 border border-indigo-200 rounded-xl text-sm font-bold text-indigo-900 cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="1.0">Halogen / Basking Bulb (IR-A/B)</option>
+                                    <option value="1.15">Deep Heat Projector (DHP)</option>
+                                    <option value="1.35">Ceramic Heat Emitter (CHE - Air only)</option>
+                                </select>
+                            </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Wattage Selection</label>
                                 <select id="lampWattage" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 cursor-pointer outline-none">
@@ -235,6 +243,8 @@
             const enclosureRetention = parseFloat(document.getElementById('enclosureType').value);
             const lampDistM = parseFloat(document.getElementById('lampDist').value) / 100;
             const lampSel = document.getElementById('lampWattage').value;
+            // 新增：读取灯泡效率系数
+            const bulbMultiplier = parseFloat(document.getElementById('bulbType').value);
             const petH = parseFloat(document.getElementById('petHeight').value);
 
             const pnl = document.getElementById('resultPanel');
@@ -248,6 +258,12 @@
             if (!hasLamp && !hasUth) {
                 err.innerHTML = "Error: Please select at least one heating source.";
                 err.classList.remove('hidden'); succ.classList.add('hidden'); return;
+            }
+
+            // 新增功能 1：环境温差防御机制 (Delta-T Check)
+            if (T_room >= T_targ) {
+                warn.innerHTML = `<div class="p-6 bg-emerald-50 border border-emerald-200 rounded-[2rem] shadow-sm"><div class="flex items-center gap-3 mb-2"><span class="text-2xl">🌿</span><p class="font-black text-emerald-900 tracking-tight text-lg">No Heating Required!</p></div><p class="text-sm text-emerald-800 leading-relaxed">Your room temperature (${T_room}°C) is already at or above the target temperature (${T_targ}°C). Please ensure all heat sources are turned off to prevent dangerous overheating.</p></div>`;
+                return; // 直接终止后续的加热计算
             }
 
             // Night Drop Warning
@@ -268,7 +284,8 @@
 
             if (hasLamp) {
                 let abs = sp.isAir ? 1.0 : sub.topAbs;
-                let p_ideal = (q_req_total * Math.pow(lampDistM, 2)) / (0.15 * abs);
+                // 新增功能 2：将灯泡热效率系数乘入理想瓦数计算中
+                let p_ideal = ((q_req_total * Math.pow(lampDistM, 2)) / (0.15 * abs)) * bulbMultiplier;
                 const LAMPS = [25, 50, 75, 100, 150];
 
                 if (lampSel === 'auto') {
@@ -284,7 +301,8 @@
                 } else p_lamp = parseInt(lampSel);
 
                 if (!forceUthOnly) {
-                    let actual_q = (0.15 * p_lamp * abs) / Math.pow(lampDistM, 2);
+                    // 反推实际热量时，也要考虑效率系数的损耗
+                    let actual_q = ((0.15 * p_lamp * abs) / Math.pow(lampDistM, 2)) / bulbMultiplier;
                     if (hasUth && actual_q < (q_req_total * 0.1)) {
                         forceUthOnly = true; p_lamp = 0;
                         warn.innerHTML += `<div class="p-5 bg-amber-50 border border-amber-200 rounded-3xl"><p class="font-bold text-amber-900 mb-1">🔭 Beam Distance Warning</p><p class="text-xs text-amber-700">Lamp is too far to contribute effectively (<10% heat reached). Switched to 100% Heat Mat mode.</p></div>`;
@@ -298,7 +316,8 @@
                             warn.innerHTML += `<div class="p-5 bg-red-100 border border-red-200 rounded-3xl"><p class="font-black text-red-900 mb-1">🚨 Power Limit Exceeded</p><p class="text-xs text-red-800 leading-relaxed">Single 150W bulb is insufficient for this enclosure's heat loss. Upgrade to a PVC cage or use dual fixtures.</p></div>`;
                         } else if (p_lamp > p_ideal) {
                             let extraWattage = p_lamp - p_ideal;
-                            let safeDist = Math.ceil(Math.sqrt((0.15 * p_lamp * abs) / q_req_total) * 100);
+                            // 计算安全距离也要加上效率系数
+                            let safeDist = Math.ceil(Math.sqrt(((0.15 * p_lamp * abs) / bulbMultiplier) / q_req_total) * 100);
                             
                             if (extraWattage > 15) {
                                 warn.innerHTML += `<div class="p-4 bg-orange-100 border border-orange-200 rounded-xl"><p class="font-bold text-orange-700 mb-1">🔥 Overheat Risk & Solution</p><p class="text-sm text-orange-600 leading-relaxed">Your ${p_lamp}W bulb is <b>${extraWattage.toFixed(1)}W</b> stronger than needed. You MUST use a Dimming Thermostat. Alternatively, you can drastically raise your lamp fixture to at least <b>${safeDist} cm</b> to safely dissipate the excess heat.</p></div>`;

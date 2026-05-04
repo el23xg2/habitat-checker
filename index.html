@@ -32,7 +32,7 @@
     <div class="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
         
         <div class="glass-header px-8 py-10 text-center relative">
-            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine <span class="text-xs bg-indigo-500 text-white px-2 py-1 rounded-full align-middle ml-2">v1.2</span></h1>
+            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine <span class="text-xs bg-indigo-500 text-white px-2 py-1 rounded-full align-middle ml-2">v1.3</span></h1>
             <p class="text-slate-400 text-sm max-w-lg mx-auto font-medium leading-relaxed">
                 Precision heating calculations based on thermodynamic physics. Get the right ballpark range and keep your pets safe.
             </p>
@@ -40,6 +40,17 @@
 
         <div class="p-6 sm:p-12 space-y-12">
             
+            <section class="flex justify-center -mt-4 mb-4">
+                <div class="bg-gray-100 p-1.5 rounded-full flex items-center shadow-inner">
+                    <button id="btn-imperial" onclick="setUnit('imperial')" class="px-6 py-2.5 rounded-full text-sm font-black transition-all bg-white text-gray-900 shadow-md">
+                        🇺🇸 Imperial (°F / In)
+                    </button>
+                    <button id="btn-metric" onclick="setUnit('metric')" class="px-6 py-2.5 rounded-full text-sm font-bold transition-all text-gray-500 hover:text-gray-900">
+                        🌍 Metric (°C / cm)
+                    </button>
+                </div>
+            </section>
+
             <section>
                 <div class="flex items-center gap-3 mb-4">
                     <span class="text-xl">⚡</span>
@@ -89,12 +100,12 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow">
-                        <label id="targetLabel" class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Target Temp (°C)</label>
-                        <input type="number" id="targetTemp" value="40" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
+                        <label id="targetLabel" class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Target Temp (°F)</label>
+                        <input type="number" id="targetTemp" value="104" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
                     </div>
                     <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow">
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Average Room Temp (°C)</label>
-                        <input type="number" id="roomTemp" value="22" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
+                        <label id="roomTempLabel" class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Average Room Temp (°F)</label>
+                        <input type="number" id="roomTemp" value="72" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
                     </div>
                 </div>
 
@@ -119,8 +130,8 @@
                         </select>
                     </div>
                     <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow">
-                        <label id="depthLabel" class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Substrate Depth (cm)</label>
-                        <input type="number" id="depth" value="2.0" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
+                        <label id="depthLabel" class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Substrate Depth (inches)</label>
+                        <input type="number" id="depth" step="0.1" value="0.8" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono text-lg font-bold">
                     </div>
                 </div>
 
@@ -134,9 +145,9 @@
                 </div>
                 
                 <div id="zAxisSettings" class="mt-4 p-6 bg-amber-50 border border-amber-200 rounded-3xl transition-all hidden">
-                    <label class="block text-sm font-bold text-amber-900 mb-2">🌲 Pet Resting Height (cm from bottom)</label>
+                    <label id="petHeightLabel" class="block text-sm font-bold text-amber-900 mb-2">🌲 Pet Resting Height (inches from bottom)</label>
                     <p class="text-xs text-amber-700 mb-4 font-medium italic">We need this to calculate vertical heat loss through convection.</p>
-                    <input type="number" id="petHeight" value="30" class="w-full md:w-1/2 px-4 py-2.5 bg-white border border-amber-300 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 font-mono text-lg">
+                    <input type="number" id="petHeight" value="12" class="w-full md:w-1/2 px-4 py-2.5 bg-white border border-amber-300 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 font-mono text-lg">
                 </div>
             </section>
 
@@ -175,8 +186,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label id="lampDistLabel" class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Distance to target (cm)</label>
-                                <input type="number" id="lampDist" value="30" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono font-bold outline-none">
+                                <label id="lampDistLabel" class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Distance to target (inches)</label>
+                                <input type="number" id="lampDist" value="12" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono font-bold outline-none">
                             </div>
                         </div>
                     </div>
@@ -229,7 +240,7 @@
                             <span class="block text-sm text-gray-400 mt-1 font-medium" id="uthStatus">Compensation for heat loss</span>
                         </div>
                         <div class="text-right">
-                            <span class="text-5xl font-black text-orange-500" id="uthRes">-- °C</span>
+                            <span class="text-5xl font-black text-orange-500" id="uthRes">--</span>
                         </div>
                     </div>
                 </div>
@@ -240,10 +251,13 @@
     </div>
 
     <script>
+        // --- 核心全局状态 ---
+        let currentUnit = 'imperial'; // 默认设为美制
+
         const SPECIES = {
-            leopard: { label: "Target Surface Temp (°C)", distLabel: "Distance: Lamp to floor (cm)", isAir: false, isDesert: false },
-            crested: { label: "Target Ambient Air Temp (°C)", distLabel: "Distance: Lamp to perch (cm)", isAir: true, isDesert: false },
-            bearded: { label: "Target Basking Temp (°C)", distLabel: "Distance: Lamp to rock (cm)", isAir: false, isDesert: true }
+            leopard: { label: "Target Surface Temp", distLabel: "Distance: Lamp to floor", isAir: false, isDesert: false },
+            crested: { label: "Target Ambient Air Temp", distLabel: "Distance: Lamp to perch", isAir: true, isDesert: false },
+            bearded: { label: "Target Basking Temp", distLabel: "Distance: Lamp to rock", isAir: false, isDesert: true }
         };
 
         const SUB_PROPS = {
@@ -252,34 +266,96 @@
             rock: { lambda: 2.0, topAbs: 1.5 }
         };
 
-        // 一键预设数据
+        // 预设数据保持为公制（后台计算标准）
         const PRESETS = {
             crested: { species: 'crested', temp: 24, encl: '0.65', sub: 'coco', clim: 'rainforest' },
             leopard: { species: 'leopard', temp: 32, encl: '0.85', sub: 'rock', clim: 'desert' },
             bearded: { species: 'bearded', temp: 40, encl: '0.45', sub: 'sand', clim: 'desert' },
-            python: { species: 'leopard', temp: 32, encl: '0.85', sub: 'bark', clim: 'moderate' } // Python shares terrestrial logic
+            python: { species: 'leopard', temp: 32, encl: '0.85', sub: 'bark', clim: 'moderate' }
         };
 
+        // --- 单位转换工具函数 ---
+        function cToF(c) { return (c * 9/5) + 32; }
+        function fToC(f) { return (f - 32) * 5/9; }
+        function cmToIn(cm) { return cm / 2.54; }
+        function inToCm(inch) { return inch * 2.54; }
+
+        function setUnit(unit) {
+            if (currentUnit === unit) return;
+
+            const tTargInput = document.getElementById('targetTemp');
+            const tRoomInput = document.getElementById('roomTemp');
+            const depthInput = document.getElementById('depth');
+            const pHeightInput = document.getElementById('petHeight');
+            const lDistInput = document.getElementById('lampDist');
+
+            if (unit === 'imperial') {
+                // 转为美制
+                tTargInput.value = Math.round(cToF(parseFloat(tTargInput.value)));
+                tRoomInput.value = Math.round(cToF(parseFloat(tRoomInput.value)));
+                depthInput.value = (cmToIn(parseFloat(depthInput.value))).toFixed(1);
+                pHeightInput.value = Math.round(cmToIn(parseFloat(pHeightInput.value)));
+                lDistInput.value = Math.round(cmToIn(parseFloat(lDistInput.value)));
+
+                document.getElementById('btn-imperial').classList.add('bg-white', 'text-gray-900', 'shadow-md', 'font-black');
+                document.getElementById('btn-imperial').classList.remove('text-gray-500', 'font-bold');
+                document.getElementById('btn-metric').classList.remove('bg-white', 'text-gray-900', 'shadow-md', 'font-black');
+                document.getElementById('btn-metric').classList.add('text-gray-500', 'font-bold');
+            } else {
+                // 转为公制
+                tTargInput.value = Math.round(fToC(parseFloat(tTargInput.value)));
+                tRoomInput.value = Math.round(fToC(parseFloat(tRoomInput.value)));
+                depthInput.value = (inToCm(parseFloat(depthInput.value))).toFixed(1);
+                pHeightInput.value = Math.round(inToCm(parseFloat(pHeightInput.value)));
+                lDistInput.value = Math.round(inToCm(parseFloat(lDistInput.value)));
+
+                document.getElementById('btn-metric').classList.add('bg-white', 'text-gray-900', 'shadow-md', 'font-black');
+                document.getElementById('btn-metric').classList.remove('text-gray-500', 'font-bold');
+                document.getElementById('btn-imperial').classList.remove('bg-white', 'text-gray-900', 'shadow-md', 'font-black');
+                document.getElementById('btn-imperial').classList.add('text-gray-500', 'font-bold');
+            }
+            
+            currentUnit = unit;
+            updateUI();
+            
+            // 如果面板是打开的，自动重新计算
+            if (!document.getElementById('resultPanel').classList.contains('hidden')) {
+                calculate();
+            }
+        }
+
         function applyPreset(id) {
-            // Update buttons UI
             document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + id).classList.add('active');
 
             const data = PRESETS[id];
             document.getElementById('speciesType').value = data.species;
-            document.getElementById('targetTemp').value = data.temp;
             document.getElementById('enclosureType').value = data.encl;
             document.getElementById('substrateType').value = data.sub;
             document.getElementById('climateType').value = data.clim;
-            
+
+            let temp = data.temp;
+            if (currentUnit === 'imperial') {
+                temp = Math.round(cToF(temp));
+            }
+            document.getElementById('targetTemp').value = temp;
+
             updateUI();
         }
 
         function updateUI() {
             const sp = SPECIES[document.getElementById('speciesType').value];
             const hasLamp = document.getElementById('hasLamp').checked;
-            document.getElementById('targetLabel').innerText = sp.label;
-            document.getElementById('lampDistLabel').innerText = sp.distLabel;
+            
+            // 动态更新文案中的单位
+            const tempUnit = currentUnit === 'imperial' ? '°F' : '°C';
+            const distUnit = currentUnit === 'imperial' ? 'inches' : 'cm';
+
+            document.getElementById('targetLabel').innerText = `${sp.label} (${tempUnit})`;
+            document.getElementById('roomTempLabel').innerText = `Average Room Temp (${tempUnit})`;
+            document.getElementById('depthLabel').innerText = `Substrate Depth (${distUnit})`;
+            document.getElementById('petHeightLabel').innerText = `Pet Resting Height (${distUnit} from bottom)`;
+            document.getElementById('lampDistLabel').innerText = `${sp.distLabel} (${distUnit})`;
             
             const lampSet = document.getElementById('lampSettings');
             lampSet.style.opacity = hasLamp ? '1' : '0.4';
@@ -296,16 +372,28 @@
             const hasLamp = document.getElementById('hasLamp').checked;
             const hasUth = document.getElementById('hasUth').checked;
             
-            const T_targ = parseFloat(document.getElementById('targetTemp').value);
-            const T_room = parseFloat(document.getElementById('roomTemp').value);
-            const depthM = parseFloat(document.getElementById('depth').value) / 100;
+            // 读取用户输入（带有当前单位的值）
+            const input_T_targ = parseFloat(document.getElementById('targetTemp').value);
+            const input_T_room = parseFloat(document.getElementById('roomTemp').value);
+            const input_depth = parseFloat(document.getElementById('depth').value);
+            const input_lampDist = parseFloat(document.getElementById('lampDist').value);
+            const input_petH = parseFloat(document.getElementById('petHeight').value);
+
+            // 引擎只接受公制 (Metric)，所以在传入引擎前统一转换
+            const T_targ = currentUnit === 'imperial' ? fToC(input_T_targ) : input_T_targ;
+            const T_room = currentUnit === 'imperial' ? fToC(input_T_room) : input_T_room;
+            const depthM = (currentUnit === 'imperial' ? inToCm(input_depth) : input_depth) / 100;
+            const lampDistM = (currentUnit === 'imperial' ? inToCm(input_lampDist) : input_lampDist) / 100;
+            const petH = currentUnit === 'imperial' ? inToCm(input_petH) : input_petH;
+
             const sub = SUB_PROPS[document.getElementById('substrateType').value];
             const climate = document.getElementById('climateType').value;
             const enclosureRetention = parseFloat(document.getElementById('enclosureType').value);
-            const lampDistM = parseFloat(document.getElementById('lampDist').value) / 100;
             const lampSel = document.getElementById('lampWattage').value;
             const bulbType = document.getElementById('bulbType').value;
-            const petH = parseFloat(document.getElementById('petHeight').value);
+            
+            const tempUnitStr = currentUnit === 'imperial' ? '°F' : '°C';
+            const distUnitStr = currentUnit === 'imperial' ? 'inches' : 'cm';
 
             const pnl = document.getElementById('resultPanel');
             const err = document.getElementById('criticalError');
@@ -321,7 +409,7 @@
             }
 
             if (T_room >= T_targ) {
-                warn.innerHTML = `<div class="p-6 bg-emerald-50 border border-emerald-200 rounded-[2rem] shadow-sm"><div class="flex items-center gap-3 mb-2"><span class="text-2xl">🌿</span><p class="font-black text-emerald-900 tracking-tight text-lg">No Heating Required!</p></div><p class="text-sm text-emerald-800 leading-relaxed">Your room temperature (${T_room}°C) is already at or above the target temperature (${T_targ}°C). Please ensure all heat sources are turned off to prevent dangerous overheating.</p></div>`;
+                warn.innerHTML = `<div class="p-6 bg-emerald-50 border border-emerald-200 rounded-[2rem] shadow-sm"><div class="flex items-center gap-3 mb-2"><span class="text-2xl">🌿</span><p class="font-black text-emerald-900 tracking-tight text-lg">No Heating Required!</p></div><p class="text-sm text-emerald-800 leading-relaxed">Your room temperature (${input_T_room}${tempUnitStr}) is already at or above the target temperature (${input_T_targ}${tempUnitStr}). Please ensure all heat sources are turned off to prevent dangerous overheating.</p></div>`;
                 return; 
             }
 
@@ -339,21 +427,19 @@
             if (hasLamp) {
                 let abs = sp.isAir ? 1.0 : sub.topAbs;
                 
-                // 新增功能：动态交叉计算矩阵 (Cross-calculation Matrix)
-                // 原理：陶瓷灯(che)主要加热空气，对材质漏风极度敏感；卤素灯(halogen)加热表面，受材质影响较小。
-                let airLossFactor = 1 - enclosureRetention; // Glass = 0.55 (High loss), PVC = 0.15 (Low loss)
+                let airLossFactor = 1 - enclosureRetention;
                 let bulbBase = 1.0;
                 let penaltyMultiplier = 0;
 
                 if (bulbType === 'halogen') {
                     bulbBase = 1.0;
-                    penaltyMultiplier = 0.3; // 卤素灯受空气流失影响较小
+                    penaltyMultiplier = 0.3; 
                 } else if (bulbType === 'dhp') {
                     bulbBase = 1.15;
                     penaltyMultiplier = 0.8;
                 } else if (bulbType === 'che') {
                     bulbBase = 1.35;
-                    penaltyMultiplier = 1.6; // 陶瓷灯在保温差的缸里，惩罚系数极高
+                    penaltyMultiplier = 1.6; 
                 }
 
                 let dynamicMultiplier = bulbBase + (airLossFactor * penaltyMultiplier);
@@ -366,7 +452,6 @@
                         forceUthOnly = true; p_lamp = 0;
                         warn.innerHTML += `<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl"><p class="text-xs font-bold text-slate-500 italic">Eco-Mode: Heat mat is sufficient; light remains off to prevent overheating.</p></div>`;
                     } else {
-                        // 计算瓦数区间 (Range Logic)
                         let lower_bound = LAMPS.slice().reverse().find(l => l <= p_ideal * 1.1) || 25;
                         let upper_bound = LAMPS.find(l => l >= p_ideal * 0.9) || 150;
                         
@@ -390,10 +475,11 @@
                     document.getElementById('lampRes').innerHTML = `${p_lamp}<span class="text-3xl md:text-4xl ml-1">W</span>`;
                     
                     let extraWattage = p_lamp - p_ideal;
-                    let safeDist = Math.ceil(Math.sqrt(((0.15 * p_lamp * abs) / dynamicMultiplier) / q_req_total) * 100);
-                    
+                    let safeDistCM = Math.ceil(Math.sqrt(((0.15 * p_lamp * abs) / dynamicMultiplier) / q_req_total) * 100);
+                    let safeDistDisplay = currentUnit === 'imperial' ? Math.ceil(cmToIn(safeDistCM)) : safeDistCM;
+
                     if (extraWattage > 15) {
-                        warn.innerHTML += `<div class="p-4 bg-orange-100 border border-orange-200 rounded-xl"><p class="font-bold text-orange-700 mb-1">🔥 Overheat Warning</p><p class="text-sm text-orange-600 leading-relaxed">Your ${p_lamp}W bulb is much stronger than the required ~${p_ideal.toFixed(0)}W. You MUST use a Dimming Thermostat, or raise the fixture to at least <b>${safeDist} cm</b>.</p></div>`;
+                        warn.innerHTML += `<div class="p-4 bg-orange-100 border border-orange-200 rounded-xl"><p class="font-bold text-orange-700 mb-1">🔥 Overheat Warning</p><p class="text-sm text-orange-600 leading-relaxed">Your ${p_lamp}W bulb is much stronger than the required ~${p_ideal.toFixed(0)}W. You MUST use a Dimming Thermostat, or raise the fixture to at least <b>${safeDistDisplay} ${distUnitStr}</b>.</p></div>`;
                     } else if (extraWattage < -15) {
                         warn.innerHTML += `<div class="p-4 bg-blue-100 border border-blue-200 rounded-xl"><p class="font-bold text-blue-700 mb-1">❄️ Heat Deficit</p><p class="text-sm text-blue-600 leading-relaxed">Your ${p_lamp}W bulb is too weak. The engine estimates you need ~${p_ideal.toFixed(0)}W. Please lower the fixture closer to the target or upgrade the bulb.</p></div>`;
                     }
@@ -404,20 +490,28 @@
             if (hasUth || forceUthOnly) {
                 document.getElementById('uthResultBox').classList.remove('hidden');
                 if (forceUthOnly) q_def = q_req_total;
+                
                 if (q_def <= 0 && !forceUthOnly) {
-                    document.getElementById('uthRes').innerText = T_targ;
+                    let display_baseline = currentUnit === 'imperial' ? Math.round(cToF(T_targ)) : T_targ;
+                    document.getElementById('uthRes').innerText = `${display_baseline} ${tempUnitStr}`;
                     document.getElementById('uthStatus').innerText = "Safe baseline temp (Lamp covers the load)";
                 } else {
                     document.getElementById('uthStatus').innerText = forceUthOnly ? "Handling 100% of heat load" : "Handling residue gap from lamp";
                     let surf_n = T_targ;
                     if (hasLamp && !forceUthOnly) surf_n = T_targ + (q_def / 8.5);
                     if (sp.isAir) surf_n += (forceUthOnly ? (T_targ - T_room) : (q_def / 8.5)) * (petH / 10);
-                    let t_set = surf_n + (q_def * depthM) / sub.lambda;
-                    document.getElementById('uthRes').innerText = t_set.toFixed(1);
+                    
+                    let t_set = surf_n + (q_def * depthM) / sub.lambda; // 算出来的底层温度是摄氏度
+                    
+                    // 将摄氏度转回用户选择的单位显示
+                    let display_t_set = currentUnit === 'imperial' ? cToF(t_set) : t_set;
+                    document.getElementById('uthRes').innerText = `${display_t_set.toFixed(1)} ${tempUnitStr}`;
 
+                    // 大部分加热垫极限在 40°C，这里也做换算提示
                     if (t_set > 40) {
                         document.getElementById('uthResultBox').classList.add('hidden');
-                        warn.innerHTML += `<div class="p-6 bg-red-50 border border-red-200 rounded-[2rem]"><p class="font-black text-lg text-red-900 mb-3 leading-tight">🛑 Hardware Limit Reached</p><p class="text-sm text-red-800 leading-relaxed italic">The mat would need to hit <strong>${t_set.toFixed(1)}°C</strong> to compensate for air loss. Consumer mats cap at 40°C.</p></div>`;
+                        let maxLimit = currentUnit === 'imperial' ? cToF(40).toFixed(1) : '40.0';
+                        warn.innerHTML += `<div class="p-6 bg-red-50 border border-red-200 rounded-[2rem]"><p class="font-black text-lg text-red-900 mb-3 leading-tight">🛑 Hardware Limit Reached</p><p class="text-sm text-red-800 leading-relaxed italic">The mat would need to hit <strong>${display_t_set.toFixed(1)}${tempUnitStr}</strong> to compensate for air loss. Consumer mats cap at ${maxLimit}${tempUnitStr}.</p></div>`;
                     }
                 }
             }
@@ -428,6 +522,8 @@
             guide += `</ul></div>`;
             warn.innerHTML += guide;
         }
+        
+        // 初始加载时刷新 UI 标签
         window.onload = updateUI;
     </script>
     <div class="max-w-3xl mx-auto mt-6 mb-10 text-center px-4">

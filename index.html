@@ -25,6 +25,9 @@
         .preset-btn { transition: all 0.2s; border: 2px solid transparent; }
         .preset-btn:hover { border-color: #818cf8; background-color: #eef2ff; }
         .preset-btn.active { border-color: #4f46e5; background-color: #e0e7ff; }
+        /* 变现按钮专属样式 */
+        .amazon-link-btn { background-color: #FF9900; color: white !important; font-weight: 900; text-transform: uppercase; letter-spacing: -0.025em; transition: all 0.2s; text-decoration: none !important; display: flex; align-items: center; justify-content: center; }
+        .amazon-link-btn:hover { background-color: #e68a00; transform: scale(1.02); }
     </style>
 </head>
 <body class="min-h-screen py-10 px-4 flex flex-col items-center justify-start">
@@ -32,7 +35,7 @@
     <div class="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
         
         <div class="glass-header px-8 py-10 text-center relative">
-            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine <span class="text-xs bg-indigo-500 text-white px-2 py-1 rounded-full align-middle ml-2">v1.3</span></h1>
+            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine <span class="text-xs bg-indigo-500 text-white px-2 py-1 rounded-full align-middle ml-2">v1.4 PRO</span></h1>
             <p class="text-slate-400 text-sm max-w-lg mx-auto font-medium leading-relaxed">
                 Precision heating calculations based on thermodynamic physics. Get the right ballpark range and keep your pets safe.
             </p>
@@ -225,23 +228,31 @@
                                 <span class="text-4xl md:text-5xl font-black text-blue-600 tracking-tighter" id="lampRes">-- W</span>
                             </div>
                         </div>
-                        <div class="pt-4 border-t border-gray-50 flex items-start gap-3">
+                        <div class="pt-4 pb-4 border-t border-gray-50 flex items-start gap-3">
                             <span class="text-lg">💡</span>
                             <p class="text-[11px] text-gray-500 font-medium leading-relaxed">
                                 <strong class="text-gray-700">Biology is not absolute.</strong> We recommend buying the higher wattage in this range and connecting it to a <strong>dimming thermostat</strong> to achieve the perfect gradient.
                             </p>
                         </div>
+                        <a href="https://amzn.to/4uo9RRL" target="_blank" class="amazon-link-btn w-full py-4 rounded-xl text-sm shadow-lg mt-2">
+                            🛒 View Recommended Zoo Med Lamp Kit
+                        </a>
                     </div>
                     
-                    <div id="uthResultBox" class="hidden bg-white p-8 rounded-[2rem] border border-orange-50 flex justify-between items-center shadow-xl relative overflow-hidden">
+                    <div id="uthResultBox" class="hidden bg-white p-8 rounded-[2rem] border border-orange-50 shadow-xl relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-2 h-full bg-orange-400"></div>
-                        <div>
-                            <span class="block text-xs font-black text-orange-400 uppercase tracking-widest">Thermostat Setting</span>
-                            <span class="block text-sm text-gray-400 mt-1 font-medium" id="uthStatus">Compensation for heat loss</span>
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <span class="block text-xs font-black text-orange-400 uppercase tracking-widest">Thermostat Setting</span>
+                                <span class="block text-sm text-gray-400 mt-1 font-medium" id="uthStatus">Compensation for heat loss</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-5xl font-black text-orange-500" id="uthRes">--</span>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-5xl font-black text-orange-500" id="uthRes">--</span>
-                        </div>
+                        <a href="https://www.amazon.com/Century-Thermostat-Controller-Germination-40-108%C3%82%C2%B0F/dp/B01I15S6OM/" target="_blank" class="amazon-link-btn w-full py-4 rounded-xl text-sm shadow-lg">
+                            ⚙️ Get Safety Thermostat Controller
+                        </a>
                     </div>
                 </div>
 

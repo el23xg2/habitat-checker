@@ -35,7 +35,7 @@
     <div class="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
         
         <div class="glass-header px-8 py-10 text-center relative">
-            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine <span class="text-xs bg-indigo-500 text-white px-2 py-1 rounded-full align-middle ml-2">v1.4 PRO</span></h1>
+            <h1 class="text-3xl font-black text-white tracking-tight mb-3">Reptile Habitat Engine <span class="text-xs bg-indigo-500 text-white px-2 py-1 rounded-full align-middle ml-2">v1.4.2 PRO</span></h1>
             <p class="text-slate-400 text-sm max-w-lg mx-auto font-medium leading-relaxed">
                 Precision heating calculations based on thermodynamic physics. Get the right ballpark range and keep your pets safe.
             </p>
@@ -170,11 +170,18 @@
                         </label>
                         <div id="lampSettings" class="space-y-5 transition-opacity">
                             <div>
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Bulb Type (Physics Engine)</label>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Bulb Type</label>
                                 <select id="bulbType" class="w-full px-3 py-2.5 bg-indigo-50 border border-indigo-200 rounded-xl text-sm font-bold text-indigo-900 cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500">
                                     <option value="halogen">Halogen Bulb (IR-A/B - Best Penetration)</option>
                                     <option value="dhp">Deep Heat Projector (DHP)</option>
                                     <option value="che">Ceramic Heat Emitter (CHE - High Air Loss)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Reflector Dome Type</label>
+                                <select id="reflectorType" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 cursor-pointer outline-none">
+                                    <option value="standard">Standard Dome (Wide spread)</option>
+                                    <option value="deep" selected>Deep Dome (Focused beam, best for >12")</option>
                                 </select>
                             </div>
                             <div>
@@ -262,8 +269,8 @@
     </div>
 
     <script>
-        // --- 核心全局状态 ---
-        let currentUnit = 'imperial'; // 默认设为美制
+        // --- 全局状态 ---
+        let currentUnit = 'imperial'; 
 
         const SPECIES = {
             leopard: { label: "Target Surface Temp", distLabel: "Distance: Lamp to floor", isAir: false, isDesert: false },
@@ -277,7 +284,6 @@
             rock: { lambda: 2.0, topAbs: 1.5 }
         };
 
-        // 预设数据保持为公制（后台计算标准）
         const PRESETS = {
             crested: { species: 'crested', temp: 24, encl: '0.65', sub: 'coco', clim: 'rainforest' },
             leopard: { species: 'leopard', temp: 32, encl: '0.85', sub: 'rock', clim: 'desert' },
@@ -285,7 +291,6 @@
             python: { species: 'leopard', temp: 32, encl: '0.85', sub: 'bark', clim: 'moderate' }
         };
 
-        // --- 单位转换工具函数 ---
         function cToF(c) { return (c * 9/5) + 32; }
         function fToC(f) { return (f - 32) * 5/9; }
         function cmToIn(cm) { return cm / 2.54; }
@@ -301,7 +306,6 @@
             const lDistInput = document.getElementById('lampDist');
 
             if (unit === 'imperial') {
-                // 转为美制
                 tTargInput.value = Math.round(cToF(parseFloat(tTargInput.value)));
                 tRoomInput.value = Math.round(cToF(parseFloat(tRoomInput.value)));
                 depthInput.value = (cmToIn(parseFloat(depthInput.value))).toFixed(1);
@@ -313,7 +317,6 @@
                 document.getElementById('btn-metric').classList.remove('bg-white', 'text-gray-900', 'shadow-md', 'font-black');
                 document.getElementById('btn-metric').classList.add('text-gray-500', 'font-bold');
             } else {
-                // 转为公制
                 tTargInput.value = Math.round(fToC(parseFloat(tTargInput.value)));
                 tRoomInput.value = Math.round(fToC(parseFloat(tRoomInput.value)));
                 depthInput.value = (inToCm(parseFloat(depthInput.value))).toFixed(1);
@@ -329,7 +332,6 @@
             currentUnit = unit;
             updateUI();
             
-            // 如果面板是打开的，自动重新计算
             if (!document.getElementById('resultPanel').classList.contains('hidden')) {
                 calculate();
             }
@@ -358,7 +360,6 @@
             const sp = SPECIES[document.getElementById('speciesType').value];
             const hasLamp = document.getElementById('hasLamp').checked;
             
-            // 动态更新文案中的单位
             const tempUnit = currentUnit === 'imperial' ? '°F' : '°C';
             const distUnit = currentUnit === 'imperial' ? 'inches' : 'cm';
 
@@ -383,14 +384,12 @@
             const hasLamp = document.getElementById('hasLamp').checked;
             const hasUth = document.getElementById('hasUth').checked;
             
-            // 读取用户输入（带有当前单位的值）
             const input_T_targ = parseFloat(document.getElementById('targetTemp').value);
             const input_T_room = parseFloat(document.getElementById('roomTemp').value);
             const input_depth = parseFloat(document.getElementById('depth').value);
             const input_lampDist = parseFloat(document.getElementById('lampDist').value);
             const input_petH = parseFloat(document.getElementById('petHeight').value);
 
-            // 引擎只接受公制 (Metric)，所以在传入引擎前统一转换
             const T_targ = currentUnit === 'imperial' ? fToC(input_T_targ) : input_T_targ;
             const T_room = currentUnit === 'imperial' ? fToC(input_T_room) : input_T_room;
             const depthM = (currentUnit === 'imperial' ? inToCm(input_depth) : input_depth) / 100;
@@ -402,6 +401,7 @@
             const enclosureRetention = parseFloat(document.getElementById('enclosureType').value);
             const lampSel = document.getElementById('lampWattage').value;
             const bulbType = document.getElementById('bulbType').value;
+            const reflectorType = document.getElementById('reflectorType').value; // 获取深浅桶选择
             
             const tempUnitStr = currentUnit === 'imperial' ? '°F' : '°C';
             const distUnitStr = currentUnit === 'imperial' ? 'inches' : 'cm';
@@ -432,30 +432,32 @@
                 q_latent = 20 * (T_targ / 20);
             }
 
-            let q_req_total = (q_sensible + q_latent) / enclosureRetention;
+            // 【物理引擎更新：分离空气对流与表面辐射热流失】
+            let base_q = q_sensible + q_latent;
+            let q_req_total = sp.isAir ? (base_q / enclosureRetention) : (base_q * (1 + (1 - enclosureRetention) * 0.4)); 
+
             let p_lamp = 0; let q_def = q_req_total; let forceUthOnly = false;
 
             if (hasLamp) {
                 let abs = sp.isAir ? 1.0 : sub.topAbs;
-                
                 let airLossFactor = 1 - enclosureRetention;
                 let bulbBase = 1.0;
                 let penaltyMultiplier = 0;
 
                 if (bulbType === 'halogen') {
-                    bulbBase = 1.0;
-                    penaltyMultiplier = 0.3; 
+                    bulbBase = 1.0; penaltyMultiplier = 0.3; 
                 } else if (bulbType === 'dhp') {
-                    bulbBase = 1.15;
-                    penaltyMultiplier = 0.8;
+                    bulbBase = 1.15; penaltyMultiplier = 0.8;
                 } else if (bulbType === 'che') {
-                    bulbBase = 1.35;
-                    penaltyMultiplier = 1.6; 
+                    bulbBase = 1.35; penaltyMultiplier = 1.6; 
                 }
 
                 let dynamicMultiplier = bulbBase + (airLossFactor * penaltyMultiplier);
                 
-                let p_ideal = ((q_req_total * Math.pow(lampDistM, 2)) / (0.15 * abs)) * dynamicMultiplier;
+                // 【物理引擎更新：应用深浅桶聚光效率】
+                let baseEff = (reflectorType === 'deep') ? 0.12 : 0.16;
+                let p_ideal = ((q_req_total * Math.pow(lampDistM, 2)) / (baseEff * abs)) * dynamicMultiplier;
+                
                 const LAMPS = [25, 50, 75, 100, 150];
 
                 if (lampSel === 'auto') {
@@ -480,13 +482,13 @@
                     }
                 } else {
                     p_lamp = parseInt(lampSel);
-                    let actual_q = ((0.15 * p_lamp * abs) / Math.pow(lampDistM, 2)) / dynamicMultiplier;
+                    let actual_q = ((baseEff * p_lamp * abs) / Math.pow(lampDistM, 2)) / dynamicMultiplier;
                     
                     document.getElementById('lampResultBox').classList.remove('hidden');
                     document.getElementById('lampRes').innerHTML = `${p_lamp}<span class="text-3xl md:text-4xl ml-1">W</span>`;
                     
                     let extraWattage = p_lamp - p_ideal;
-                    let safeDistCM = Math.ceil(Math.sqrt(((0.15 * p_lamp * abs) / dynamicMultiplier) / q_req_total) * 100);
+                    let safeDistCM = Math.ceil(Math.sqrt(((baseEff * p_lamp * abs) / dynamicMultiplier) / q_req_total) * 100);
                     let safeDistDisplay = currentUnit === 'imperial' ? Math.ceil(cmToIn(safeDistCM)) : safeDistCM;
 
                     if (extraWattage > 15) {
@@ -512,13 +514,11 @@
                     if (hasLamp && !forceUthOnly) surf_n = T_targ + (q_def / 8.5);
                     if (sp.isAir) surf_n += (forceUthOnly ? (T_targ - T_room) : (q_def / 8.5)) * (petH / 10);
                     
-                    let t_set = surf_n + (q_def * depthM) / sub.lambda; // 算出来的底层温度是摄氏度
+                    let t_set = surf_n + (q_def * depthM) / sub.lambda;
                     
-                    // 将摄氏度转回用户选择的单位显示
                     let display_t_set = currentUnit === 'imperial' ? cToF(t_set) : t_set;
                     document.getElementById('uthRes').innerText = `${display_t_set.toFixed(1)} ${tempUnitStr}`;
 
-                    // 大部分加热垫极限在 40°C，这里也做换算提示
                     if (t_set > 40) {
                         document.getElementById('uthResultBox').classList.add('hidden');
                         let maxLimit = currentUnit === 'imperial' ? cToF(40).toFixed(1) : '40.0';
@@ -534,7 +534,6 @@
             warn.innerHTML += guide;
         }
         
-        // 初始加载时刷新 UI 标签
         window.onload = updateUI;
     </script>
     <div class="max-w-3xl mx-auto mt-6 mb-10 text-center px-4">

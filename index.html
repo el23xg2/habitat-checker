@@ -241,8 +241,8 @@
                                 <strong class="text-gray-700">Biology is not absolute.</strong> We recommend buying the higher wattage in this range and connecting it to a <strong>dimming thermostat</strong> to achieve the perfect gradient.
                             </p>
                         </div>
-                        <a href="https://amzn.to/4uo9RRL" target="_blank" class="amazon-link-btn w-full py-4 rounded-xl text-sm shadow-lg mt-2">
-                            🛒 View Recommended Zoo Med Lamp Kit
+                        <a id="dynamicLampLink" href="#" target="_blank" class="amazon-link-btn w-full py-4 rounded-xl text-sm shadow-lg mt-2">
+                            🛒 Get Recommended Lamp
                         </a>
                     </div>
                     
@@ -282,6 +282,32 @@
             paper: { lambda: 0.05, topAbs: 0.8 }, bark: { lambda: 0.11, topAbs: 1.0 },
             coco: { lambda: 0.06, topAbs: 1.05 }, sand: { lambda: 0.25, topAbs: 1.35 },
             rock: { lambda: 2.0, topAbs: 1.5 }
+        };
+
+        // 【新增】商品分发链接矩阵 (根据灯种类和瓦数自动匹配)
+        // ⚠️ 请在这里替换为你真实的亚马逊联盟链接 ⚠️
+        const PRODUCT_LINKS = {
+            halogen: {
+                25: { url: "https://amzn.to/4u5a50g", text: "🛒 Get 25W Halogen Basking Bulb" },
+                50: { url: "https://amzn.to/3QIQjcv", text: "🛒 Get 50W Halogen Basking Bulb" },
+                75: { url: "https://amzn.to/4drjOrX", text: "🛒 Get 75W Halogen Basking Bulb" },
+                100: { url: "https://amzn.to/4cSmS0b", text: "🛒 Get 100W Halogen Basking Bulb" },
+                150: { url: "https://amzn.to/4tVWloM", text: "🛒 Get 150W Halogen Basking Bulb" }
+            },
+            che: {
+                25: { url: "https://amzn.to/4cUHftK", text: "🛒 Get 25W Ceramic Heat Emitter" },
+                50: { url: "https://amzn.to/4cUHftK", text: "🛒 Get 50W Ceramic Heat Emitter" },
+                75: { url: "https://amzn.to/4dchO5D", text: "🛒 Get 75W Ceramic Heat Emitter" },
+                100: { url: "https://amzn.to/42i8JDi", text: "🛒 Get 100W Ceramic Heat Emitter" },
+                150: { url: "https://amzn.to/3QQhrX0", text: "🛒 Get 150W Ceramic Heat Emitter" }
+            },
+            dhp: { // 深度碳纤维加热器通常只有 50W 和 80W，这里做模糊映射
+                25: { url: "https://amzn.to/4eYTYNe", text: "🛒 Get 50W Deep Heat Projector" },
+                50: { url: "https://amzn.to/4eYTYNe", text: "🛒 Get 50W Deep Heat Projector" },
+                75: { url: "https://amzn.to/4unULfc", text: "🛒 Get 75W Deep Heat Projector" },
+                100: { url: "https://amzn.to/4uvLZMi", text: "🛒 Get 100W Deep Heat Projector" },
+                150: { url: "https://amzn.to/4uvLZMi", text: "🛒 Get 80W Deep Heat Projector" } 
+            }
         };
 
         const PRESETS = {
@@ -432,12 +458,12 @@
                 q_latent = 20 * (T_targ / 20);
             }
 
-            // 【物理引擎更新：分离空气对流与表面辐射热流失】
             let base_q = q_sensible + q_latent;
             let q_req_total = sp.isAir ? (base_q / enclosureRetention) : (base_q * (1 + (1 - enclosureRetention) * 0.4)); 
 
             let p_lamp = 0; let q_def = q_req_total; let forceUthOnly = false;
 
+            // 【动态链接及瓦数计算更新模块】
             if (hasLamp) {
                 let abs = sp.isAir ? 1.0 : sub.topAbs;
                 let airLossFactor = 1 - enclosureRetention;
@@ -453,12 +479,11 @@
                 }
 
                 let dynamicMultiplier = bulbBase + (airLossFactor * penaltyMultiplier);
-                
-                // 【物理引擎更新：应用深浅桶聚光效率】
                 let baseEff = (reflectorType === 'deep') ? 0.12 : 0.16;
                 let p_ideal = ((q_req_total * Math.pow(lampDistM, 2)) / (baseEff * abs)) * dynamicMultiplier;
                 
                 const LAMPS = [25, 50, 75, 100, 150];
+                let finalWattageForLink = 50; // 初始化最终瓦数变量
 
                 if (lampSel === 'auto') {
                     if (hasUth && p_ideal < 10 && !sp.isAir) {
@@ -468,6 +493,9 @@
                         let lower_bound = LAMPS.slice().reverse().find(l => l <= p_ideal * 1.1) || 25;
                         let upper_bound = LAMPS.find(l => l >= p_ideal * 0.9) || 150;
                         
+                        // 记录最终推荐购买的瓦数（取高不取低，配合温控器）
+                        finalWattageForLink = upper_bound;
+
                         document.getElementById('lampResultBox').classList.remove('hidden');
                         
                         if (lower_bound === upper_bound) {
@@ -482,6 +510,8 @@
                     }
                 } else {
                     p_lamp = parseInt(lampSel);
+                    finalWattageForLink = p_lamp; // 用户手动选择的瓦数
+                    
                     let actual_q = ((baseEff * p_lamp * abs) / Math.pow(lampDistM, 2)) / dynamicMultiplier;
                     
                     document.getElementById('lampResultBox').classList.remove('hidden');
@@ -492,11 +522,25 @@
                     let safeDistDisplay = currentUnit === 'imperial' ? Math.ceil(cmToIn(safeDistCM)) : safeDistCM;
 
                     if (extraWattage > 15) {
-                        warn.innerHTML += `<div class="p-4 bg-orange-100 border border-orange-200 rounded-xl"><p class="font-bold text-orange-700 mb-1">🔥 Overheat Warning</p><p class="text-sm text-orange-600 leading-relaxed">Your ${p_lamp}W bulb is much stronger than the required ~${p_ideal.toFixed(0)}W. You MUST use a Dimming Thermostat, or raise the fixture to at least <b>${safeDistDisplay} ${distUnitStr}</b>.</p></div>`;
+                        warn.innerHTML += `<div class="p-4 bg-orange-100 border border-orange-200 rounded-xl">
+                            <p class="font-bold text-orange-700 mb-1">🔥 Overheat Warning</p>
+                            <p class="text-sm text-orange-600 leading-relaxed">Your ${p_lamp}W bulb is much stronger than the required ~${p_ideal.toFixed(0)}W. You MUST use a Dimming Thermostat, or raise the fixture to at least <b>${safeDistDisplay} ${distUnitStr}</b>.</p>
+                            <a href="https://amzn.to/4tXg1sm" target="_blank" class="mt-3 block w-full text-center bg-orange-500 text-white font-bold py-2 rounded-lg hover:bg-orange-600 transition shadow-sm">⚙️ Get Dimming Thermostat</a>
+                        </div>`;
                     } else if (extraWattage < -15) {
                         warn.innerHTML += `<div class="p-4 bg-blue-100 border border-blue-200 rounded-xl"><p class="font-bold text-blue-700 mb-1">❄️ Heat Deficit</p><p class="text-sm text-blue-600 leading-relaxed">Your ${p_lamp}W bulb is too weak. The engine estimates you need ~${p_ideal.toFixed(0)}W. Please lower the fixture closer to the target or upgrade the bulb.</p></div>`;
                     }
                     q_def = q_req_total - actual_q;
+                }
+
+                // 【新增：动态更新购买链接】
+                if (!forceUthOnly) {
+                    let linkObj = PRODUCT_LINKS[bulbType][finalWattageForLink] || PRODUCT_LINKS[bulbType][150]; // 防止匹配不到，给个最大默认值
+                    let dynamicLinkEl = document.getElementById('dynamicLampLink');
+                    if (dynamicLinkEl) {
+                        dynamicLinkEl.href = linkObj.url;
+                        dynamicLinkEl.innerHTML = linkObj.text;
+                    }
                 }
             }
 

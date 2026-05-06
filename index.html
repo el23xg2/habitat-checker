@@ -245,8 +245,11 @@
                             🛒 Get Recommended Lamp
                         </a>
                         <a href="https://amzn.to/4tXg1sm" target="_blank" class="block w-full text-center bg-slate-100 text-slate-600 font-bold py-3 mt-2 rounded-xl hover:bg-slate-200 transition text-xs border border-slate-200">
-    + Add Dimming Thermostat (Recommended)
-</a>
+                            + Add Dimming Thermostat (Recommended)
+                        </a>
+                        <a id="dynamicDomeLink" href="#" target="_blank" class="block w-full text-center bg-slate-100 text-slate-600 font-bold py-3 mt-2 rounded-xl hover:bg-slate-200 transition text-xs border border-slate-200">
+                            🔗 Add Matching Ceramic Dome
+                        </a>
                     </div>
                     
                     <div id="uthResultBox" class="hidden bg-white p-8 rounded-[2rem] border border-orange-50 shadow-xl relative overflow-hidden">
@@ -287,7 +290,6 @@
             rock: { lambda: 2.0, topAbs: 1.5 }
         };
 
-        // 【新增】商品分发链接矩阵 (根据灯种类和瓦数自动匹配)
         // ⚠️ 请在这里替换为你真实的亚马逊联盟链接 ⚠️
         const PRODUCT_LINKS = {
             halogen: {
@@ -311,6 +313,12 @@
                 100: { url: "https://amzn.to/4uvLZMi", text: "🛒 Get 100W Deep Heat Projector" },
                 150: { url: "https://amzn.to/4uvLZMi", text: "🛒 Get 150W DHP (Max Available Size)" } 
             }
+        };
+
+        // 【新增】灯罩链接矩阵
+        const DOME_LINKS = {
+            standard: { url: "https://amzn.to/4uvjg5o", text: "🔗 Add Standard Ceramic Dome" },
+            deep: { url: "https://amzn.to/4w8eMYZ", text: "🔗 Add Deep Ceramic Dome (Best for >12\")" }
         };
 
         const PRESETS = {
@@ -543,6 +551,14 @@
                     if (dynamicLinkEl) {
                         dynamicLinkEl.href = linkObj.url;
                         dynamicLinkEl.innerHTML = linkObj.text;
+                    }
+
+                    // 【新增：更新灯罩链接】
+                    let domeObj = DOME_LINKS[reflectorType];
+                    let dynamicDomeEl = document.getElementById('dynamicDomeLink');
+                    if (dynamicDomeEl && domeObj) {
+                        dynamicDomeEl.href = domeObj.url;
+                        dynamicDomeEl.innerHTML = domeObj.text;
                     }
                 }
             }

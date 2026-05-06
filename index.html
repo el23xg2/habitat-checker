@@ -327,8 +327,8 @@
         };
 
         const DOME_LINKS = {
-            standard: { url: "https://amzn.to/4uvJg5o", text: "🔗 Add Standard Ceramic Dome" },
-            deep: { url: "https://amzn.to/4w8eMYZ", text: "🔗 Add Deep Ceramic Dome (Safer)" }
+            standard: { url: "https://amzn.to/YOUR_STANDARD_DOME_LINK", text: "🔗 Add Standard Ceramic Dome" },
+            deep: { url: "https://amzn.to/YOUR_DEEP_DOME_LINK", text: "🔗 Add Deep Ceramic Dome (Safer)" }
         };
 
         const PRESETS = {
@@ -425,7 +425,9 @@
                 let bulbBase = bulbType === 'halogen' ? 1.0 : (bulbType === 'dhp' ? 1.15 : 1.35);
                 let penaltyMultiplier = bulbType === 'halogen' ? 0.3 : (bulbType === 'dhp' ? 0.8 : 1.6);
                 let dynamicMultiplier = bulbBase + ((1 - enclosureRetention) * penaltyMultiplier);
-                let baseEff = reflectorType === 'deep' ? 0.12 : 0.16;
+                
+                // 🐞 BUG FIX 2: Swapped Dome Efficiencies (Deep dome is MORE efficient, focuses heat better)
+                let baseEff = reflectorType === 'deep' ? 0.16 : 0.12; 
                 let p_ideal = ((q_req_total * Math.pow(lampDistM, 2)) / (baseEff * abs)) * dynamicMultiplier;
                 
                 const LAMPS = [25, 50, 75, 100, 150];
@@ -439,6 +441,10 @@
                         document.getElementById('lampResultBox').classList.remove('hidden');
                         document.getElementById('lampRes').innerHTML = lower_bound === upper_bound ? `${upper_bound}<span class="text-3xl ml-1">W</span>` : `${lower_bound} - ${upper_bound}<span class="text-3xl ml-1">W</span>`;
                         if (p_ideal > 160) warn.innerHTML += `<div class="p-6 bg-red-50 border border-red-200 rounded-[1.5rem]"><p class="font-black text-red-900 mb-1">🚨 Severe Heat Loss Detected</p><p class="text-sm text-red-800 leading-relaxed">Even a 150W bulb will struggle to heat this setup. <strong>Solution:</strong> Cover the screen top with HVAC foil tape or upgrade to a PVC enclosure.</p></div>`;
+                        
+                        // 🐞 BUG FIX 1: Subtract the calculated lamp wattage from the UTH heat deficit pool!
+                        let actual_q = ((baseEff * upper_bound * abs) / Math.pow(lampDistM, 2)) / dynamicMultiplier;
+                        q_def = q_req_total - actual_q;
                     }
                 } else {
                     let p_lamp = parseInt(lampSel); finalWattageForLink = p_lamp;
